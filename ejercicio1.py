@@ -11,9 +11,12 @@ def funcionOptimizacion (num_act, horarios):
     aux = ""
     for i in range(np.size(solucion[1])):
         x=solucion[1][i]
-        if x != x + 1:
-            if x != 0:
-                aux= aux+str(i+1)+" " 
+        if i < len(solucion[1]) - 1:
+            if x != solucion[1][i+1]:
+                if x != 0:
+                    aux= aux+str(i+1)+" " 
+        else:
+            aux = aux+str(i+1)
     print(aux)
 
 def calculoBeneficio(horarios):
@@ -76,7 +79,9 @@ funcionOptimizacion(5, [[1,10],[7,9],[9,14],[10,20],[20,24]]) #esperado 1 4 5
 
 funcionOptimizacion(4, [[1,6], [6,24], [20,22], [22,23]]) # Esperado 1, 2
 
-funcionOptimizacion(10, [[1,3], [3,6], [4,10], [9,12], [10,13], [10,20], [14,18], [18,22], [20,24], [22,24]])# 23
+funcionOptimizacion(10, [[1,3], [3,6], [4,10], [9,12], [10,13], [10,20], [14,18], [18,22], [20,24], [22,24]])# Esperado 2 4 5 7 8 9 10
 
-funcionOptimizacion(8, [[1,3], [3,7], [8,13], [13,15], [16,18], [18,21], [21,22], [22,24]])# 21
+funcionOptimizacion(8, [[1,3], [3,7], [8,13], [13,15], [16,18], [18,21], [21,22], [22,24]])# Esperado 1 2 3 4 5 6 7 8
+
+
 
