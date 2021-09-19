@@ -20,7 +20,7 @@ def funcionOptimizacion (num_act, horarios):
     listActs = encontrarActividad(horarios,solucionAux[indiceMayor])
 
     print(listActs)
-    print(vectorB[indiceMayor])
+
 def encontrarActividad(horario1, horario2):
     listaActs = []
 
