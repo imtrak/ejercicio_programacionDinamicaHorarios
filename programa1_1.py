@@ -9,13 +9,6 @@ def funcionOptimizacion (num_act, horarios):
 
     solucion = solve_knapsack(vectorB,vectorB,horarios,dia)
     print(solucion)
-    aux = ""
-    for i in range(np.size(solucion[1])):
-        x=solucion[1][i]
-        if x != x + 1:
-            if x != 0:
-                aux= aux+str(i+1)+" " 
-    print(aux)
 
 def calculoBeneficio(horarios):
     vectorB = []
@@ -43,7 +36,7 @@ def knapsack_recursive(dp, profits, weights, horarios, horarioIndex,capacity, cu
     
   # base checks
   if capacity <= 0 or currentIndex >= len(profits):
-    return [0,dp[capacity]]
+    return 0
 
   if horarioIndex > -1:
     if interseccion(horarios[horarioIndex], horarios[currentIndex]):
@@ -52,7 +45,7 @@ def knapsack_recursive(dp, profits, weights, horarios, horarioIndex,capacity, cu
 
   # if we have already solved a similar problem, return the result from memory
   if dp[capacity][currentIndex] != 0:
-    return [dp[capacity][currentIndex],dp[capacity]]
+    return dp[capacity][currentIndex]
 
   # recursive call after choosing the element at the currentIndex
   # if the weight of the element at currentIndex exceeds the capacity, we
@@ -60,15 +53,15 @@ def knapsack_recursive(dp, profits, weights, horarios, horarioIndex,capacity, cu
   profit1 = 0
   if weights[currentIndex] <= capacity:
     aux =  knapsack_recursive(dp, profits, weights, horarios, currentIndex ,capacity - weights[currentIndex], currentIndex + 1)
-    profit1 = profits[currentIndex] + aux[0]
+    profit1 = profits[currentIndex] + aux
 
   # recursive call after excluding the element at the currentIndex
   profit2 = knapsack_recursive(
     dp, profits, weights, horarios, horarioIndex,capacity, currentIndex + 1)
   
-  dp[capacity][currentIndex] = max(profit1, profit2[0])
+  dp[capacity][currentIndex] = max(profit1, profit2)
 
-  return [dp[capacity][currentIndex],dp[capacity]]
+  return dp[capacity][currentIndex]
 
 
 funcionOptimizacion(5, [[2,5],[7,22],[22,24],[22,23],[23,24]]) #esperado 1 2 3
