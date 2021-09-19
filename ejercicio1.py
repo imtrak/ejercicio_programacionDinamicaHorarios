@@ -1,87 +1,110 @@
 import numpy as np
 from numpy.core.multiarray import empty_like
-from numpy.core.numeric import True_
+from numpy.core.numeric import True_, indices
 
 def funcionOptimizacion (num_act, horarios):
     dia = 24
-    vectorB = calculoBeneficio(horarios)
-
-    solucion = solve_knapsack(vectorB,vectorB,horarios,dia)
-    print(solucion)
-    aux = ""
-    for i in range(np.size(solucion[1])):
-        x=solucion[1][i]
-        if i < len(solucion[1]) - 1:
-            if x != solucion[1][i+1]:
-                if x != 0:
-                    aux= aux+str(i+1)+" " 
-        else:
-            aux = aux+str(i+1)
-    print(aux)
-
-def calculoBeneficio(horarios):
     vectorB = []
 
-    for x in horarios:
-        vectorB.append(abs(x[0]-x[1]))
+    solucion = subConjuntos(horarios)
+    solucionAux = []
+    for x in solucion:
+        solucionAux.append(conjuntoSinInterseccion(x))
     
-    return vectorB
+    for x in solucionAux:
+        vectorB.append(calculoBeneficio(x))
+            
+    indiceMayor = encontrarIndiceMayor(vectorB)
+
+
+    listActs = encontrarActividad(horarios,solucionAux[indiceMayor])
+
+    print(listActs)
+    print(vectorB[indiceMayor])
+def encontrarActividad(horario1, horario2):
+    listaActs = []
+
+    for x in range(len(horario2)):
+        for y in range(len(horario1)):
+            if horario2[x] == horario1[y]:
+                listaActs.append(y+1)
+    return listaActs        
+    
+def encontrarIndiceMayor(vectorB):
+    mayor = 0
+    indice = 0
+    for x in range(len(vectorB)):
+        if vectorB[x] > mayor:
+            mayor = vectorB[x]
+            indice = x
+
+            
+    return indice
+
+
+
+
+def calculoBeneficio(horarios):
+    suma = 0
+    vectorB = []
+    if horarios:
+        for x in horarios:
+            vectorB.append(abs(x[0]-x[1]))
+
+        for y in vectorB:
+            suma = suma+y
+    
+    return suma
+
+def conjuntoSinInterseccion(conjunto):
+
+    if len(conjunto) >= 2:
+        for x in range(len(conjunto)):
+            for y in range(x + 1,len(conjunto)):
+                if interseccion(conjunto[x],conjunto[y]):
+                    return []
+        return conjunto            
+    else:
+        if conjunto:
+            return conjunto
+    
 
 def interseccion(hora1,hora2):
-    if hora1[0] >= hora2[0] and hora1[0] < hora2[1]:
+    if hora1[0] > hora2[0] and hora1[0] < hora2[1]:
         return True
-    if hora2[0] >= hora1[0] and hora2[0] < hora1[1]:
+    if hora2[0] > hora1[0] and hora2[0] < hora1[1]:
+        return True
+    if hora1[0] == hora2[0] and hora1[1] == hora2[1]:
+        return True
+    if hora1[0] == hora2[0]:
         return True
     else:
         return False
 
-def solve_knapsack(profits, weights, horarios ,capacity):
-  dp = np.zeros((capacity + 1,len(profits)))
-  return knapsack_recursive(dp, profits, weights, horarios, -1 ,capacity, 0)
+
+
+def solucionar(beneficio, horarios):
+    for e in sorted(horarios, key=lambda s: (len(s), s)):
+        print(e)
+
+def subConjuntos(conjunto):
+    return subconjunto_recursivo([], conjunto)
+
+def subconjunto_recursivo(actual,conjunto):
+    if conjunto:
+        return subconjunto_recursivo(actual,conjunto[1:])+ subconjunto_recursivo(actual+[conjunto[0]],conjunto[1:])
+    return [actual]
 
 
 
-def knapsack_recursive(dp, profits, weights, horarios, horarioIndex,capacity, currentIndex):
-    
-  # base checks
-  if capacity <= 0 or currentIndex >= len(profits):
-    return [0,dp[capacity]]
-
-  if horarioIndex > -1:
-    if interseccion(horarios[horarioIndex], horarios[currentIndex]):
-        return knapsack_recursive(dp, profits, weights, horarios,horarioIndex,capacity, currentIndex + 1)
-
-
-  # if we have already solved a similar problem, return the result from memory
-  if dp[capacity][currentIndex] != 0:
-    return [dp[capacity][currentIndex],dp[capacity]]
-
-  # recursive call after choosing the element at the currentIndex
-  # if the weight of the element at currentIndex exceeds the capacity, we
-  # shouldn't process this
-  profit1 = 0
-  if weights[currentIndex] <= capacity:
-    aux =  knapsack_recursive(dp, profits, weights, horarios, horarioIndex + 1,capacity - weights[currentIndex], currentIndex + 1)
-    profit1 = profits[currentIndex] + aux[0]
-
-  # recursive call after excluding the element at the currentIndex
-  profit2 = knapsack_recursive(
-    dp, profits, weights, horarios, horarioIndex + 1,capacity, currentIndex + 1)
-  
-  dp[capacity][currentIndex] = max(profit1, profit2[0])
-
-  return [dp[capacity][currentIndex],dp[capacity]]
-
-
-funcionOptimizacion(5, [[2,5],[7,22],[22,24],[22,23],[23,24]]) #esperado 1 2 3
+funcionOptimizacion(5, [[2,5],[7,22],[22,24],[22,23],[23,24]]) #esperado 1 2 4 5
 
 funcionOptimizacion(5, [[1,10],[7,9],[9,14],[10,20],[20,24]]) #esperado 1 4 5
 
 funcionOptimizacion(4, [[1,6], [6,24], [20,22], [22,23]]) # Esperado 1, 2
 
-funcionOptimizacion(10, [[1,3], [3,6], [4,10], [9,12], [10,13], [10,20], [14,18], [18,22], [20,24], [22,24]])# Esperado 2 4 5 7 8 9 10
+funcionOptimizacion(10, [[1,3], [3,6], [4,10], [9,12], [10,13], [10,20], [14,18], [18,22], [20,24], [22,24]])# Esperado 1 3 6 9
 
 funcionOptimizacion(8, [[1,3], [3,7], [8,13], [13,15], [16,18], [18,21], [21,22], [22,24]])# Esperado 1 2 3 4 5 6 7 8
 
-
-
+funcionOptimizacion(7, [[2,5], [4,7], [7,13], [12,15], [16,19], [18,21], [21,23]]) # 2 3 6 7
