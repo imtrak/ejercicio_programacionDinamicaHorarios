@@ -1,6 +1,22 @@
-import numpy as np
-from numpy.core.multiarray import empty_like
-from numpy.core.numeric import True_, indices
+file=open("prueba.txt","r")
+string1 = file.read()
+lineas = string1.split('\n')
+num_actividades=int(lineas[0])
+
+
+horarios=[[0]*3]*num_actividades
+
+for i in range(num_actividades):
+  aux=lineas[i+1]
+  horarios[i]=aux.split(' ')
+file.close()
+
+sl=[horarios[i][1:3] for i in range(num_actividades)]
+
+for x in range(num_actividades):
+  for y in range(2):
+    sl[x][y]=int( sl[x][y])
+
 
 def funcionOptimizacion (num_act, horarios):
     dia = 24
@@ -95,16 +111,4 @@ def subconjunto_recursivo(actual,conjunto):
         return subconjunto_recursivo(actual,conjunto[1:])+ subconjunto_recursivo(actual+[conjunto[0]],conjunto[1:])
     return [actual]
 
-
-
-funcionOptimizacion(5, [[2,5],[7,22],[22,24],[22,23],[23,24]]) #esperado 1 2 4 5
-
-funcionOptimizacion(5, [[1,10],[7,9],[9,14],[10,20],[20,24]]) #esperado 1 4 5
-
-funcionOptimizacion(4, [[1,6], [6,24], [20,22], [22,23]]) # Esperado 1, 2
-
-funcionOptimizacion(10, [[1,3], [3,6], [4,10], [9,12], [10,13], [10,20], [14,18], [18,22], [20,24], [22,24]])# Esperado 1 3 6 9
-
-funcionOptimizacion(8, [[1,3], [3,7], [8,13], [13,15], [16,18], [18,21], [21,22], [22,24]])# Esperado 1 2 3 4 5 6 7 8
-
-funcionOptimizacion(7, [[2,5], [4,7], [7,13], [12,15], [16,19], [18,21], [21,23]]) # 2 3 6 7
+funcionOptimizacion(num_actividades,sl)
